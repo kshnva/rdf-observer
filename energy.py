@@ -24,17 +24,17 @@ def load_json_file(file_path):#Load the ECI values from the JSON file
     with open(file_path, 'r') as file:
         json_data = json.load(file)
     return json_data 
-def run_mc(cell,T):#Code to run the MonteCarloSimulation
+def run_mc(cell,T):#Run the Monte Carlo Simulation for the cell 
 	internal_energy=[]
-	mc = Montecarlo(cell, T)
+	mc=Montecarlo(cell,T)
 	Au_conc.append(mc.count_atoms()['Au']/tot)
-	for mc_step in mc.irun(500):  
-    		if mc_step.step % 10 == 0:
-        		internal_energy.append(mc_step.energy)
-	mean_energy.append(np.mean(internal_energy)/tot)
+	for mc_step in mc.irun(500):
+		if mc_step.step%10==0:
+			internal_energy.append(mc_step.energy)
+	mean_energy.append(np.mean(internal_energy/tot))
 	formula.append(cell.get_chemical_formula(empirical=False))
 	temperature.append(T)
-def find_pure_energy(atoms, string,T):
+def find_pure_energy(atoms, string,T):#Finding the pure energy of the lattices
 	for i in range(len(atoms)):
 			atoms[i].symbol=string
 	atoms = attach_calculator(settings, atoms=atoms, eci=eci)
@@ -47,7 +47,6 @@ def find_pure_energy(atoms, string,T):
 	else:
 		Au_conc.append(0)
 		return(atoms.get_total_energy()/tot)
-	
 file_path = 'eci_l1.json'  
 json_dict = load_json_file(file_path)
 eci=json_dict
@@ -66,7 +65,7 @@ mean_energy=[]
 size=(10,10,10)
 tot=np.product(size)
 atoms = connect('aucu.db').get(id=1).toatoms()*size
-temp=[100]
+temp=[100,500,800]
 temperature=[]
 Au_conc=[]
 Au_pure,Cu_pure=0,0
