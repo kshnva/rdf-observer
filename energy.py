@@ -47,6 +47,13 @@ def find_pure_energy(atoms, string,T):#Finding the pure energy of the lattices
 	else:
 		Au_conc.append(0)
 		return(atoms.get_total_energy()/tot)
+def get_free_energy(U,T):
+	Kb=1.380649e-23
+	beta=1/(Kb*T)
+	N=1000
+#	Z=math.exp(-U*beta*N)
+	F=(Kb*T*U*beta*N)
+	free_energy.append(F)
 file_path = 'eci_l1.json'  
 json_dict = load_json_file(file_path)
 eci=json_dict
@@ -62,10 +69,11 @@ settings=CEBulk(crystalstructure='fcc',
                max_cluster_dia=[6.0,5,5])
 formula=[]
 mean_energy=[]
+free_energy=[]
 size=(10,10,10)
 tot=np.product(size)
 atoms = connect('aucu.db').get(id=1).toatoms()*size
-temp=[100,500,800]
+temp=[500]
 temperature=[]
 Au_conc=[]
 Au_pure,Cu_pure=0,0
@@ -82,9 +90,12 @@ for T in temp:#for different temperature ranges
 		run_mc(cell,T)
 		i=i+10
 	Cu_pure=find_pure_energy(atoms,'Cu',T)
-
 for i in range(len(mean_energy)):
-	formation.append((mean_energy[i]-(Au_conc[i]*Au_pure)-((1-Au_conc[i])*Cu_pure))*96.484934)
+	u=((mean_energy[i]-(Au_conc[i]*Au_pure)-((1-Au_conc[i])*Cu_pure))*96.484934)
+	formation.append(u)
+	get_free_energy(mean_energy[i],temperature[i])
+for i in range (len(free_energy)):
+	free_energy[i]=(free_energy[i]-(Au_conc[i]*free_energy[0])-((1-Au_conc[i])*free_energy[-1]))*96.484934
 plt.plot(Au_conc,formation)
 plt.xlabel('Au Conc')
 plt.ylabel('Formation Energy (kJ/mole)')
