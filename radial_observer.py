@@ -22,7 +22,7 @@ def get_radial(atoms):
     plt.xlabel('r / Å',size=15)
     plt.ylabel('g(r)',size=15)
     plt.savefig(fname="Radial Distribution Function")
-class LayerMonitor(MCObserver):
+class RDFObserver(MCObserver):
 
 
     def __init__(self, atoms: ase.Atoms):
@@ -74,7 +74,7 @@ atoms = connect('aucu.db').get(id=1).toatoms()*size
 atoms = attach_calculator(settings, atoms=atoms, eci=eci)
 for j in range (0,int(tot/3)):
 	atoms[j].symbol='Cu'
-monitor = LayerMonitor(atoms)
+monitor = RDFObserver(atoms)
 mc = Montecarlo(atoms, T)
 mc.attach(monitor, interval=50)
 mc.run(steps=500)
